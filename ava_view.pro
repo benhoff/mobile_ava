@@ -1,6 +1,8 @@
 TEMPLATE = app
 
 QT += qml quick
+QT += core
+QT += network
 
 SOURCES += main.cpp
 
@@ -16,4 +18,11 @@ DISTFILES += \
     ProjectIndexLayout.qml \
     ProjectListModel.qml \
     ProjectListView.qml \
-    ava_view.pro.user
+    ava_view.pro.user \
+    ../../ava/projects/views.py \
+    ../../ava/projects/admin.py \
+    ../../ava/projects/models.py \
+    ../../ava/projects/permissions.py \
+    ../../ava/projects/serializers.py \
+    ../../ava/projects/tests.py \
+    ../../ava/projects/urls.py
