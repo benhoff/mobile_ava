@@ -4,20 +4,33 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QUrl>
-#include <QByteArray>
 #include <QEvent>
 #include <QDebug>
 #include <QObject>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QList>
+#include <QString>
+/*
+QVariant this_dumb_method_call(QList<QVariant> api, int index, template <typename> T)
+{
+    return api[index];
+}
+*/
+class SimpleData {
+public:
+    QString title;
+    QString description;
+    QString owner;
+};
 
 int main(int argc, char *argv[])
 {
-    // http://karanbalkar.com/2014/02/parsing-json-using-qt-5-framework/
-
     QGuiApplication app(argc, argv);
-    QUrl ava_url("http://127.0.0.1:8000/projects/1/");
+    QUrl ava_url("http://127.0.0.1:8000/projects/");
     QNetworkRequest ava_request(ava_url);
     ava_request.setRawHeader("User-Agent", "alexthenicefontguy:foobar");
-    qDebug() << ava_request.header(QNetworkRequest::UserAgentHeader);
 
     QNetworkAccessManager *manager = new QNetworkAccessManager();
     QEventLoop loop;
@@ -30,12 +43,39 @@ int main(int argc, char *argv[])
     QNetworkReply* reply = manager->get(ava_request);
     loop.exec();
 
-    QByteArray response = reply->readAll();
+    QString response = (QString)reply->readAll();
+
     qDebug() << response;
+    QJsonDocument temp = QJsonDocument::fromJson(response.toUtf8());
 
+    QJsonObject jsonObj = temp.object();
 
-    //QQmlApplicationEngine engine;
-    //engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+    int count = jsonObj["count"].toInt();
+    QString next = jsonObj["next"].toString();
+    QString previous = jsonObj["previous"].toString();
+
+    QJsonArray project_list = jsonObj["results"].toArray();
+    QList<SimpleData> data;
+
+    for(int i=0;i < count; i++)
+    {
+        QJsonObject value = project_list[i].toObject();
+
+        SimpleData result;
+        result.title = value["title"].toString();
+        result.description = value["description"].toString();
+        result.owner = value["owner"].toString();
+
+        data.append(result);
+    }
+
+    qDebug() << data[0].title;
+    //api_projects_result = value.toList();
+
+    // QJsonArray api_projects_result = ?;
+
+    QQmlApplicationEngine engine;
+    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
     manager->~QNetworkAccessManager();
     return app.exec();
