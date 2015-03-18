@@ -5,5 +5,5 @@ Window {
 	id: main
 	title: 'Avalanche Theory'
 	color: "transparent"
-	ProjectListView {}
+    //ProjectListView {}
 }

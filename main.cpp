@@ -1,29 +1,48 @@
 #include <QGuiApplication>
-#include <QQmlApplicationEngine>
+
+#include <QQmlEngine>
+#include <QQmlComponent>
+#include <QQmlContext>
+#include <QQmlListProperty>
+
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QUrl>
+
 #include <QEvent>
 #include <QDebug>
 #include <QObject>
+
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
-#include <QList>
+
 #include <QString>
+#include <QStringList>
+
 /*
-QVariant this_dumb_method_call(QList<QVariant> api, int index, template <typename> T)
-{
-    return api[index];
-}
+ TODO:
+ Look into: QQmlNetworkAccessManagerFactory
+ Need to figure out how to create components/single views and stitch together
+
+ Need to fully understand QQmlEngine
+
+
+
 */
+/*
 class SimpleData {
 public:
     QString title;
     QString description;
     QString owner;
 };
+*/
+
+
+
+
 
 int main(int argc, char *argv[])
 {
@@ -55,27 +74,35 @@ int main(int argc, char *argv[])
     QString previous = jsonObj["previous"].toString();
 
     QJsonArray project_list = jsonObj["results"].toArray();
-    QList<SimpleData> data;
+
+    /*
+    QQmlListProperty<QStringList> data;
 
     for(int i=0;i < count; i++)
     {
         QJsonObject value = project_list[i].toObject();
 
-        SimpleData result;
-        result.title = value["title"].toString();
-        result.description = value["description"].toString();
-        result.owner = value["owner"].toString();
+        QStringList result;
+        result.append(value["title"].toString());
+        result.append(value["description"].toString());
+        result.append(value["owner"].toString());
 
-        data.append(result);
+        data.append;
     }
+    */
 
-    qDebug() << data[0].title;
-    //api_projects_result = value.toList();
+    QQmlEngine engine;
+    // What is needed in the root context?
+    // API Authentication
+    // create Project context
 
-    // QJsonArray api_projects_result = ?;
+    // instantiatie our own objects using QQmlComponent and place them QQuickWindow
+    // Subclass QQuickWindow and setup a constructor
 
-    QQmlApplicationEngine engine;
-    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+    QQmlContext project_context(engine.rootContext());
+    //engine.rootContext()->setContextProperty("project_list", &data);
+    QQmlComponent component(&engine, QUrl::fromLocalFile("main.qml"));
+    component.create();
 
     manager->~QNetworkAccessManager();
     return app.exec();
